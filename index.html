@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cherry Snake</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(255, 45, 85, 0.22), transparent 35%),
+        radial-gradient(circle at bottom, rgba(120, 0, 40, 0.35), transparent 40%),
+        #080003;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    .game-box {
+      width: 92%;
+      max-width: 520px;
+      text-align: center;
+      background: rgba(18, 0, 8, 0.92);
+      padding: 24px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 90, 130, 0.35);
+      box-shadow:
+        0 0 45px rgba(255, 0, 80, 0.22),
+        inset 0 0 25px rgba(255, 255, 255, 0.03);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: 3px;
+      color: #ff6b8a;
+      text-shadow:
+        0 0 8px rgba(255, 80, 120, 0.9),
+        0 0 22px rgba(255, 45, 85, 0.45);
+    }
+
+    .subtitle {
+      margin: 8px 0 18px;
+      font-size: 14px;
+      opacity: 0.75;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 1 / 1;
+      background: #100006;
+      border: 2px solid #8f1230;
+      border-radius: 10px;
+      box-shadow:
+        inset 0 0 28px rgba(255, 0, 80, 0.16),
+        0 0 20px rgba(255, 45, 85, 0.16);
+      display: block;
+      margin: 0 auto;
+    }
+
+    .hud {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 16px;
+    }
+
+    .hud div {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .message {
+      min-height: 24px;
+      margin-top: 12px;
+      color: #ffb3c1;
+      font-weight: bold;
+    }
+
+    .buttons {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 11px 18px;
+      border: none;
+      border-radius: 999px;
+      background: #b11226;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 14px rgba(255, 45, 85, 0.45);
+    }
+
+    button:hover {
+      background: #ff2d55;
+    }
+
+    .mobile-controls {
+      display: none;
+      margin-top: 14px;
+      grid-template-columns: repeat(3, 52px);
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .mobile-controls button {
+      width: 52px;
+      height: 52px;
+      padding: 0;
+      font-size: 20px;
+    }
+
+    .empty {
+      visibility: hidden;
+    }
+
+    .footer {
+      margin-top: 14px;
+      font-size: 12px;
+      opacity: 0.45;
+    }
+
+    @media (max-width: 600px) {
+  body {
+    overflow: auto;
+    padding: 8px 0;
+    align-items: flex-start;
+  }
+
+  .game-box {
+    width: 94%;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  h1 {
+    font-size: 22px;
+    letter-spacing: 4px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    margin: 6px 0 10px;
+  }
+
+ canvas {
+  width: min(76vw, 300px);
+  height: min(76vw, 300px);
+}
+
+  .hud {
+    margin-top: 10px;
+    font-size: 13px;
+    gap: 8px;
+  }
+
+  .hud div {
+    padding: 8px;
+  }
+
+  .message {
+    margin-top: 8px;
+    min-height: 18px;
+    font-size: 13px;
+  }
+
+  .buttons {
+    margin-top: 8px;
+  }
+
+  button {
+    padding: 9px 15px;
+    font-size: 13px;
+  }
+
+  .mobile-controls {
+    display: grid;
+    margin-top: 10px;
+    grid-template-columns: repeat(3, 46px);
+    gap: 7px;
+  }
+
+  .mobile-controls button {
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+  }
+
+  .footer {
+    display: none;
+  }
+}
+  </style>
+</head>
+
+<body>
+  <div class="game-box">
+    <h1>CHERRY SNAKE</h1>
+    <div class="subtitle">Pegue as cerejas e não bata nas paredes 🍒</div>
+
+    <canvas id="game" width="400" height="400"></canvas>
+
+    <div class="hud">
+      <div>Pontos: <span id="score">0</span></div>
+      <div>Recorde: <span id="best">0</span></div>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="buttons">
+      <button onclick="restartGame()">Reiniciar</button>
+      <button onclick="togglePause()" id="pauseBtn">Pausar</button>
+    </div>
+
+    <div class="mobile-controls">
+      <div class="empty"></div>
+      <button onclick="setDirection('UP')">▲</button>
+      <div class="empty"></div>
+
+      <button onclick="setDirection('LEFT')">◀</button>
+      <button onclick="togglePause()">Ⅱ</button>
+      <button onclick="setDirection('RIGHT')">▶</button>
+
+      <div class="empty"></div>
+      <button onclick="setDirection('DOWN')">▼</button>
+      <div class="empty"></div>
+    </div>
+
+    <div class="footer">Feito em HTML, CSS e JavaScript</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const cherryImg = new Image();
+    cherryImg.src = "cereja.png";
+    const scoreEl = document.getElementById("score");
+    const bestEl = document.getElementById("best");
+    const messageEl = document.getElementById("message");
+    const pauseBtn = document.getElementById("pauseBtn");
+
+    const box = 20;
+    const totalBoxes = canvas.width / box;
+
+    let snake;
+    let food;
+    let direction;
+    let nextDirection;
+    let score;
+    let bestScore = localStorage.getItem("cherrySnakeBest") || 0;
+    let gameInterval;
+    let gameOver;
+    let paused;
+
+    bestEl.textContent = bestScore;
+
+    function startGame() {
+      snake = [
+        { x: 9 * box, y: 10 * box },
+        { x: 8 * box, y: 10 * box },
+        { x: 7 * box, y: 10 * box }
+      ];
+
+      direction = "RIGHT";
+      nextDirection = "RIGHT";
+      score = 0;
+      gameOver = false;
+      paused = false;
+
+      scoreEl.textContent = score;
+      messageEl.textContent = "";
+      pauseBtn.textContent = "Pausar";
+
+      food = randomFood();
+
+      clearInterval(gameInterval);
+      gameInterval = setInterval(draw, 120);
+    }
+
+    function randomFood() {
+      let newFood;
+
+      do {
+        newFood = {
+          x: Math.floor(Math.random() * totalBoxes) * box,
+          y: Math.floor(Math.random() * totalBoxes) * box
+        };
+      } while (snake.some(part => part.x === newFood.x && part.y === newFood.y));
+
+      return newFood;
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") setDirection("LEFT");
+      if (e.key === "ArrowUp") setDirection("UP");
+      if (e.key === "ArrowRight") setDirection("RIGHT");
+      if (e.key === "ArrowDown") setDirection("DOWN");
+
+      if (e.key === " " || e.key.toLowerCase() === "p") {
+        togglePause();
+      }
+    });
+
+    function setDirection(newDirection) {
+      if (newDirection === "LEFT" && direction !== "RIGHT") nextDirection = "LEFT";
+      if (newDirection === "UP" && direction !== "DOWN") nextDirection = "UP";
+      if (newDirection === "RIGHT" && direction !== "LEFT") nextDirection = "RIGHT";
+      if (newDirection === "DOWN" && direction !== "UP") nextDirection = "DOWN";
+    }
+
+    let touchStartX = 0;
+let touchStartY = 0;
+
+canvas.addEventListener("touchstart", (e) => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener("touchend", (e) => {
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndY = e.changedTouches[0].clientY;
+
+  const diffX = touchEndX - touchStartX;
+  const diffY = touchEndY - touchStartY;
+
+  if (Math.abs(diffX) < 25 && Math.abs(diffY) < 25) return;
+
+  if (Math.abs(diffX) > Math.abs(diffY)) {
+    if (diffX > 0) {
+      setDirection("RIGHT");
+    } else {
+      setDirection("LEFT");
+    }
+  } else {
+    if (diffY > 0) {
+      setDirection("DOWN");
+    } else {
+      setDirection("UP");
+    }
+  }
+}, { passive: true });
+    function drawGrid() {
+      ctx.strokeStyle = "rgba(255,255,255,0.04)";
+
+      for (let i = 0; i <= canvas.width; i += box) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+      }
+    }
+
+    function drawSnake() {
+      snake.forEach((part, index) => {
+        ctx.fillStyle = index === 0 ? "#ff2d55" : "#b11226";
+        ctx.fillRect(part.x, part.y, box, box);
+
+        ctx.strokeStyle = "rgba(255,255,255,0.12)";
+        ctx.strokeRect(part.x, part.y, box, box);
+      });
+    }
+
+   function drawFood() {
+  const tamanho = 32;
+  const ajuste = (tamanho - box) / 2;
+
+  ctx.drawImage(
+    cherryImg,
+    food.x - ajuste,
+    food.y - ajuste,
+    tamanho,
+    tamanho
+  );
+}
+
+    function draw() {
+      if (gameOver || paused) return;
+
+      direction = nextDirection;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+      drawSnake();
+      drawFood();
+
+      let headX = snake[0].x;
+      let headY = snake[0].y;
+
+      if (direction === "LEFT") headX -= box;
+      if (direction === "UP") headY -= box;
+      if (direction === "RIGHT") headX += box;
+      if (direction === "DOWN") headY += box;
+
+      const hitWall =
+        headX < 0 ||
+        headY < 0 ||
+        headX >= canvas.width ||
+        headY >= canvas.height;
+
+      const hitSelf = snake.some(part => part.x === headX && part.y === headY);
+
+      if (hitWall || hitSelf) {
+        endGame();
+        return;
+      }
+
+      if (headX === food.x && headY === food.y) {
+        score++;
+        scoreEl.textContent = score;
+        food = randomFood();
+      } else {
+        snake.pop();
+      }
+
+      snake.unshift({ x: headX, y: headY });
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);
+      gameOver = true;
+
+      if (score > bestScore) {
+        bestScore = score;
+        localStorage.setItem("cherrySnakeBest", bestScore);
+        bestEl.textContent = bestScore;
+        messageEl.textContent = "Novo recorde! Pontuação: " + score;
+      } else {
+        messageEl.textContent = "Game Over — Pontuação: " + score;
+      }
+    }
+
+    function restartGame() {
+      startGame();
+    }
+
+    function togglePause() {
+      if (gameOver) return;
+
+      paused = !paused;
+      pauseBtn.textContent = paused ? "Continuar" : "Pausar";
+      messageEl.textContent = paused ? "Jogo pausado" : "";
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
