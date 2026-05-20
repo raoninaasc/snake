@@ -117,13 +117,8 @@
     }
 
     .mobile-controls {
-      display: none;
-      margin-top: 14px;
-      grid-template-columns: repeat(3, 52px);
-      gap: 8px;
-      justify-content: center;
-      align-items: center;
-    }
+  display: none;
+}
 
     .mobile-controls button {
       width: 52px;
@@ -144,36 +139,40 @@
 
     @media (max-width: 600px) {
   body {
-    overflow: auto;
-    padding: 8px 0;
-    align-items: flex-start;
+    overflow: hidden;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
   }
 
   .game-box {
-  width: 98%;
-  padding: 14px;
-  border-radius: 14px;
-}
+    width: 94vw;
+    max-width: 420px;
+    padding: 18px;
+    border-radius: 18px;
+  }
 
   h1 {
-    font-size: 22px;
+    font-size: 24px;
     letter-spacing: 4px;
+    margin-bottom: 6px;
   }
 
   .subtitle {
     font-size: 12px;
-    margin: 6px 0 10px;
+    margin: 6px 0 14px;
   }
 
-canvas {
-  width: 96vw;
-  height: 96vw;
-  max-width: none;
-}
+  canvas {
+    width: 86vw;
+    height: 86vw;
+    max-width: 360px;
+    max-height: 360px;
+  }
 
   .hud {
-    margin-top: 10px;
-    font-size: 13px;
+    margin-top: 12px;
+    font-size: 14px;
     gap: 8px;
   }
 
@@ -188,25 +187,16 @@ canvas {
   }
 
   .buttons {
-    margin-top: 8px;
+    margin-top: 10px;
   }
 
   button {
-    padding: 9px 15px;
+    padding: 9px 16px;
     font-size: 13px;
   }
 
   .mobile-controls {
-    display: grid;
-    margin-top: 10px;
-    grid-template-columns: repeat(3, 46px);
-    gap: 7px;
-  }
-
-  .mobile-controls button {
-    width: 46px;
-    height: 46px;
-    font-size: 18px;
+    display: none;
   }
 
   .footer {
